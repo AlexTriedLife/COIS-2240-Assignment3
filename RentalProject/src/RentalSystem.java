@@ -3,10 +3,25 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class RentalSystem {
+	// Private static instance to implement the singleton design pattern (allowing only one instance)
+	private static RentalSystem instance;
+	
+	 // Private constructor prevents creation of multiple instances
+    private RentalSystem() {}
+	
     private List<Vehicle> vehicles = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
     private RentalHistory rentalHistory = new RentalHistory();
-
+    
+	// Global access point lazily creates the instance if it does not exist
+	public static RentalSystem getInstance() {
+		// Lazy instantiation
+		if (instance == null) {
+			instance = new RentalSystem();
+		}
+		return instance;
+	}
+    
     public void addVehicle(Vehicle vehicle) {
         vehicles.add(vehicle);
     }
