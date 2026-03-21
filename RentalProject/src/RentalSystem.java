@@ -41,7 +41,12 @@ public class RentalSystem {
     public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Available) {
             vehicle.setStatus(Vehicle.VehicleStatus.Rented);
-            rentalHistory.addRecord(new RentalRecord(vehicle, customer, date, amount, "RENT"));
+            // Create record for vehicle being rented
+            RentalRecord record = new RentalRecord(vehicle, customer, date, amount, "RENT");
+            // Add record to the system
+            rentalHistory.addRecord(record);
+            // Save record to file
+            saveRecord(record);
             System.out.println("Vehicle rented to " + customer.getCustomerName());
         }
         else {
@@ -52,7 +57,12 @@ public class RentalSystem {
     public void returnVehicle(Vehicle vehicle, Customer customer, LocalDate date, double extraFees) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Rented) {
             vehicle.setStatus(Vehicle.VehicleStatus.Available);
-            rentalHistory.addRecord(new RentalRecord(vehicle, customer, date, extraFees, "RETURN"));
+            // Create record for vehicle being returned
+            RentalRecord record = new RentalRecord(vehicle, customer, date, extraFees, "RETURN");
+            // Add record to system
+            rentalHistory.addRecord(record);
+            // Save record to file
+            saveRecord(record);
             System.out.println("Vehicle returned by " + customer.getCustomerName());
         }
         else {
@@ -174,7 +184,6 @@ public class RentalSystem {
     }
     
     // Save customer locally in a file called customers.txt
-    
     public void saveCustomer(Customer customer)	{
 		// Create a BufferedWriter which appends Customer information to the file customers.txt
     	// If saving fails, print an error message
@@ -194,11 +203,34 @@ public class RentalSystem {
     		// Log error
     		System.out.println("Error saving customer: " + e.getMessage());
     	}
+    }
+    
+    // Save RentalRecord locally in a file called rental_records.txt
+    public void saveRecord(RentalRecord record) {
     	
-    	
+    	// Create a BufferedWriter which appends RentalRecord to the file rental_records.txt
+    	// If saving fails, print an error message
+    	try (BufferedWriter writer = new BufferedWriter(new FileWriter("rental_records.txt", true))) {
+    		// Comma separate RentalRecord attributes into a new string with the format "RecordType, VehiclePlate, CustomerName, RecordDate, RecordAmount"
+    		String recordData = String.format("%s,%s,%s,%s,%.2f",
+    				record.getRecordType(),
+    				record.getVehicle().getLicensePlate(),
+    				record.getCustomer().getCustomerName(),
+    				record.getRecordDate().toString(),
+    				record.getTotalAmount()			  				
+    		);
+    		// Write record data to file
+    		writer.write(recordData);
+    		// Write a new line for the next data entry
+    		writer.newLine();
+
+    	} catch (IOException e) {
+    		// Log error
+    		System.out.println("Error saving record: " + e.getMessage());
+
+    	}
 
     }
-
     
     
 }
