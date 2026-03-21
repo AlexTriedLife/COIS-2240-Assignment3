@@ -1,4 +1,7 @@
 import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -13,6 +16,7 @@ public class RentalSystem {
     private List<Customer> customers = new ArrayList<>();
     private RentalHistory rentalHistory = new RentalHistory();
     
+    
 	// Global access point lazily creates the instance if it does not exist
 	public static RentalSystem getInstance() {
 		// Lazy instantiation
@@ -24,6 +28,8 @@ public class RentalSystem {
     
     public void addVehicle(Vehicle vehicle) {
         vehicles.add(vehicle);
+        // Save to file
+        saveVehicle(vehicle);
     }
 
     public void addCustomer(Customer customer) {
@@ -136,4 +142,34 @@ public class RentalSystem {
                 return c;
         return null;
     }
+    
+    
+    // FILE I/O //
+    
+    // Save vehicle locally in a file called vehicles.txt
+    public void saveVehicle(Vehicle vehicle) {
+		// Create a BufferedWriter which appends RentalRecords to the file vehicles.txt
+    	// If saving fails, print an error message
+    	try (BufferedWriter writer = new BufferedWriter(new FileWriter("vehicles.txt", true))) {
+    		// Comma separate vehicle attributes into a new string with the format "Plate, Make, Model, Year, Status"
+    		String vehicleData = String.format("%s,%s,%s,%d,%s",
+    				vehicle.getLicensePlate(),
+    				vehicle.getMake(),
+    				vehicle.getModel(),
+    				vehicle.getYear(),
+    				vehicle.getStatus()
+    		);
+    		
+    		// Use writer to write vehicle data to file vehicles.txt
+    		writer.write(vehicleData);
+    		// Write a new line for the next data entry
+    		writer.newLine();
+    	
+    	} catch (IOException e) {
+			// Log error
+			System.out.println("Error saving vehicle: " + e.getMessage());
+		}
+    }
+    
+    
 }
