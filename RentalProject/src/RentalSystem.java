@@ -34,6 +34,8 @@ public class RentalSystem {
 
     public void addCustomer(Customer customer) {
         customers.add(customer);
+        // Save to file
+        saveCustomer(customer);
     }
 
     public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
@@ -148,7 +150,7 @@ public class RentalSystem {
     
     // Save vehicle locally in a file called vehicles.txt
     public void saveVehicle(Vehicle vehicle) {
-		// Create a BufferedWriter which appends RentalRecords to the file vehicles.txt
+		// Create a BufferedWriter which appends Vehicle information to the file vehicles.txt
     	// If saving fails, print an error message
     	try (BufferedWriter writer = new BufferedWriter(new FileWriter("vehicles.txt", true))) {
     		// Comma separate vehicle attributes into a new string with the format "Plate, Make, Model, Year, Status"
@@ -170,6 +172,33 @@ public class RentalSystem {
 			System.out.println("Error saving vehicle: " + e.getMessage());
 		}
     }
+    
+    // Save customer locally in a file called customers.txt
+    
+    public void saveCustomer(Customer customer)	{
+		// Create a BufferedWriter which appends Customer information to the file customers.txt
+    	// If saving fails, print an error message
+    	try (BufferedWriter writer = new BufferedWriter(new FileWriter("customers.txt", true))) {
+    		// Comma separate customer attributes into a new string with the format "ID, Name"
+    		String customerData = String.format("%d,%s",
+    				customer.getCustomerId(),
+    				customer.getCustomerName()
+    		);
+    		
+    		// Write customer data to file
+    		writer.write(customerData);
+    		// Write a new line for the next data entry
+    		writer.newLine();
+    		
+    	}	catch (IOException e) {
+    		// Log error
+    		System.out.println("Error saving customer: " + e.getMessage());
+    	}
+    	
+    	
+
+    }
+
     
     
 }
