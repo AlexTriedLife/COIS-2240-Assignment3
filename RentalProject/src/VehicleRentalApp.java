@@ -61,7 +61,15 @@ public class VehicleRentalApp {
                     
                     if (vehicle != null){
 	                    vehicle.setLicensePlate(plate);
-	                    rentalSystem.addVehicle(vehicle);
+	                    
+	                    // Returns true if vehicle is successfully added
+	                    if(rentalSystem.addVehicle(vehicle)) {
+		                    System.out.println("Vehicle added successfully.");
+	                    } 
+	                    else {
+	                    	// Failed to add vehicle
+		                    System.out.println("Vehicle not added successfully.");
+	                    }
                     }
                     else {
 	                    System.out.println("Vehicle not added successfully.");
@@ -75,9 +83,17 @@ public class VehicleRentalApp {
                     System.out.print("Enter name: ");
                     String cname = scanner.nextLine();
 
-                    rentalSystem.addCustomer(new Customer(cid, cname));
-                    System.out.println("Customer added successfully.");
-                    break;
+                    // Returns true if customer is successfully added
+                    if(rentalSystem.addCustomer(new Customer(cid, cname))) {
+                    	System.out.println("Customer added successfully.");
+                    }	
+                    else {
+                    	// Failed to add customer
+                    	System.out.println("Customer not added successfully.");
+                    }
+                    
+                	break;
+
                     
                 case 3:
                 	rentalSystem.displayVehicles(Vehicle.VehicleStatus.Available);

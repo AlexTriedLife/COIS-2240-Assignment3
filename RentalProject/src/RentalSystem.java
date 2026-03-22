@@ -31,16 +31,42 @@ public class RentalSystem {
 		return instance;
 	}
     
-    public void addVehicle(Vehicle vehicle) {
+    public boolean addVehicle(Vehicle vehicle) {
+    	// Check if vehicle is already in the system by checking license plate in order to prevent duplicate vehicles
+    	
+    	// If findVehicleByPlate does not return null it means that plate already exists in the system
+    	if (findVehicleByPlate(vehicle.getLicensePlate()) != null) {
+    		// Log error
+    		System.out.println("Error: Vehicle with license plate: " + vehicle.getLicensePlate() + " already exists in the system.");
+    		
+    		// Vehicle was not added
+    		return false;
+    	}
+
+    	// Only add vehicle to system and save if vehicle doesn't already exist
         vehicles.add(vehicle);
-        // Save to file
         saveVehicle(vehicle);
+        // Vehicle successfully added
+        return true;
     }
 
-    public void addCustomer(Customer customer) {
+    public boolean addCustomer(Customer customer) {
+    	// Check if customer is already in the system by checking customerID in order to prevent duplicate customers
+    	
+    	// If findCustomerByID does not return null it means that customerID already exists in the system
+    	if (findCustomerById(customer.getCustomerId()) != null) {
+    		// Log error
+    		System.out.println("Error: Customer with ID: " + customer.getCustomerId() + " already exists in the system.");
+    		
+    		// Customer was not added
+    		return false;
+    	}
+
+    	// Only add customer to system and save if customer doesn't already exist
         customers.add(customer);
-        // Save to file
         saveCustomer(customer);
+        // Customer successfully added
+        return true;
     }
 
     public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
