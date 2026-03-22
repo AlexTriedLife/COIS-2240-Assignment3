@@ -1,5 +1,8 @@
 import java.util.List;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -9,13 +12,15 @@ public class RentalSystem {
 	// Private static instance to implement the singleton design pattern (allowing only one instance)
 	private static RentalSystem instance;
 	
-	 // Private constructor prevents creation of multiple instances
-    private RentalSystem() {}
-	
     private List<Vehicle> vehicles = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
     private RentalHistory rentalHistory = new RentalHistory();
     
+    // Private constructor prevents creation of multiple instances
+    private RentalSystem() {
+    	// Populate vehicles, customers, and rentalHistory with data from local storage
+    	loadData();
+    }
     
 	// Global access point lazily creates the instance if it does not exist
 	public static RentalSystem getInstance() {
@@ -158,6 +163,9 @@ public class RentalSystem {
     
     // FILE I/O //
     
+    
+    // OUTPUT //
+    
     // Save vehicle locally in a file called vehicles.txt
     public void saveVehicle(Vehicle vehicle) {
 		// Create a BufferedWriter which appends Vehicle information to the file vehicles.txt
@@ -230,6 +238,111 @@ public class RentalSystem {
 
     	}
 
+    }
+    
+    // INPUT //
+    
+    private void loadData() {
+    	// Load vehicles from vehicles.txt
+    	
+    	// Read in data from vehicles.txt
+    	try (BufferedReader reader = new BufferedReader(new FileReader("vehicles.txt"))) {
+    		// The line to read in
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			// Split csv values(plate,make,model,year,status) to a string array
+    			String vehicleData[] = line.split(",");
+    			
+    			// Extract the vehicle data
+    			String plate = vehicleData[0];
+    			String make = vehicleData[1];
+    			String model = vehicleData[2];
+    			int year = Integer.parseInt(vehicleData[3]);
+    			// Match the string to the corresponding enum value 
+    			Vehicle.VehicleStatus status = Vehicle.VehicleStatus.valueOf(vehicleData[4]);
+    			
+    			// Create the new vehicle and save it to the list vehicles
+    			// TODO: add logic handling for different types of vehicles
+    			// 5 is number of seats
+    			Vehicle vehicle = new Car(make, model, year, 5);
+    			vehicle.setLicensePlate(plate);
+    			vehicle.setStatus(status);
+    			vehicles.add(vehicle);
+    			
+    		}
+    		
+		} catch (IOException e) {
+			// Log error if file not found
+			System.out.println("Error loading vehicles.txt: " + e.getMessage());
+		}
+    	
+    	// Load customers from customers.txt
+    	
+    	// Read in data from customers.txt
+    	try (BufferedReader reader = new BufferedReader(new FileReader("customers.txt"))) {
+    		// The line to read in
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			// Split csv values(id,name) to a string array
+    			String customerData[] = line.split(",");
+    			
+    			// Extract the vehicle data
+    			int customerID = Integer.parseInt(customerData[0]);
+    			String name = customerData[1];
+    			
+    			// Create the new Customer and add to the list customers
+    			Customer customer = new Customer(customerID, name);
+    			customers.add(customer);
+    		}
+    		
+		} catch (IOException e) {
+			// Log error if file not found
+			System.out.println("Error loading customers.txt: " + e.getMessage());
+		}
+    	
+    	// Load rental records from rental_records.txt
+    	
+    	// Read in data from customers.txt
+    	try (BufferedReader reader = new BufferedReader(new FileReader("rental_records.txt"))) {
+    		// The line to read in
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			// Split csv values (RecordType, VehiclePlate, CustomerName, RecordDate, RecordAmount) to a string array
+    			String recordData[] = line.split(",");
+    			
+    			// Extract the record data
+    			String recordType = recordData[0];
+    			String vehiclePlate = recordData[1];
+    			String customerName = recordData[2];
+    			// Convert date string into a LocalDate
+    			LocalDate recordDate = LocalDate.parse(recordData[3]);
+    			double totalAmount = Double.parseDouble(recordData[4]);
+    			
+    			
+    			// Find vehicle by plate
+    			Vehicle vehicle = findVehicleByPlate(vehiclePlate);
+    			
+    			// Set to the corresponding customer in customers if found
+    			Customer customer = null;
+    			// Find if customer exists in customers
+    			for (Customer c: customers) {
+    				// If customer name is in the system
+    				if(c.getCustomerName().equals(customerName)) {
+    					customer = c;
+    				}
+    			}
+    			
+    			// If customer and vehicle are both valid create a new RentalRecord and add it to RentalHistory
+    			if (vehicle != null && customer != null) {
+    				RentalRecord record = new RentalRecord(vehicle, customer, recordDate, totalAmount, recordType);
+    				rentalHistory.addRecord(record);
+    			}
+    		}
+    		
+		} catch (IOException e) {
+			// Log error if file not found
+			System.out.println("Error loading rental_records.txt: " + e.getMessage());
+		}
     }
     
     
