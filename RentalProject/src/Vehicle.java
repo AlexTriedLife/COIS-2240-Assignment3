@@ -20,7 +20,12 @@ public abstract class Vehicle {
     }
 
     public void setLicensePlate(String plate) {
-        this.licensePlate = plate == null ? null : plate.toUpperCase();
+    	// If plate is invalid throw an IllegalArgumentException 
+    	if (!isValidPlate(plate)) {
+    		throw new IllegalArgumentException("Invalid license plate format. License plate must be exactly 3 letters followed by 3 numbers.");
+    	}
+    	
+        this.licensePlate =  plate.toUpperCase();
     }
 
     public void setStatus(VehicleStatus status) {
@@ -51,4 +56,33 @@ public abstract class Vehicle {
     	return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
     }
 
+    // Returns true if plate is not null, not empty(should have a length of 6), and follows the format three letters followed by three numbers
+    private boolean isValidPlate(String plate) {
+    	
+    	if (plate == null || plate.length() != 6) {
+    		return false;
+    	}
+    	
+    	// First three characters of the string ( beginning to 3)
+    	String letters = plate.substring(0,3);
+    	// Last three characters of the string (3 to end)
+    	String numbers = plate.substring(3);
+    	// Validate first three characters of the string are letters
+    	for (int i = 0; i < letters.length(); i++) {
+    		// If character is not a letter return false
+    		if(!Character.isLetter(letters.charAt(i))) {
+    			return false;
+    		}
+    	}
+    	
+    	// Validate the following three characters are numbers
+    	for (int i = 0; i < numbers.length(); i++) {
+    		// If character is not a digit return false
+    		if(!Character.isDigit(numbers.charAt(i))) {
+    			return false;
+    		}
+    	}
+    	
+    	return true;
+    }
 }
