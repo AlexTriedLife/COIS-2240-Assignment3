@@ -1,1 +1,3 @@
-BYPL690,Honda,Civic,2016,Available
+AAA111,Toyota,Corolla,2019,Rented
+BBB222,Honda,Civic,2021,Rented
+CCC333,Ford,Focus,2024,Rented
