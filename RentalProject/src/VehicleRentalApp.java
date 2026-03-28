@@ -60,18 +60,27 @@ public class VehicleRentalApp {
 		            }
                     
                     if (vehicle != null){
-	                    vehicle.setLicensePlate(plate);
+	                    try {
+	                    	// Try setting license plate (throws exception if invalid)
+							vehicle.setLicensePlate(plate);
+							
+							// Only executes if the plate is valid (didn't throw an exception)
+		                    if(rentalSystem.addVehicle(vehicle)) {
+			                    System.out.println("Vehicle added successfully.");
+		                    } else {
+		                    	// Failed to add vehicle
+			                    System.out.println("Vehicle not added successfully.");
+		                    }
+							
+						} catch (IllegalArgumentException e) {
+							// If the license plate is invalid display a message
+							System.out.println("Error: " + e.getMessage());
+						}
 	                    
-	                    // Returns true if vehicle is successfully added
-	                    if(rentalSystem.addVehicle(vehicle)) {
-		                    System.out.println("Vehicle added successfully.");
-	                    } 
-	                    else {
-	                    	// Failed to add vehicle
-		                    System.out.println("Vehicle not added successfully.");
-	                    }
-                    }
-                    else {
+	                   
+	                   
+                    }  else {
+                    	// If vehicle creation failed
 	                    System.out.println("Vehicle not added successfully.");
                     }
                     break;
