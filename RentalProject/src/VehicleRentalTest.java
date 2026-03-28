@@ -5,11 +5,14 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+// For singleton testing
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
+
 class VehicleRentalTest {
 	// Objects to test
 	private RentalSystem testSystem;
-	private Customer testCustomer;
-	private Vehicle testVehicle;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -124,5 +127,29 @@ class VehicleRentalTest {
 		assertFalse(testSystem.returnVehicle(truck, customer2, date, 0.0));
 		
 	}
-
+	
+	@Test
+	void testSingletonRentalSystem() {
+		try {
+			// Get the constructor of the RentalSystemClass
+			Constructor<RentalSystem> constructor = RentalSystem.class.getDeclaredConstructor();
+			
+			// Get the modifiers from the RentalSystem constructor
+			int modifiers = constructor.getModifiers();
+			
+			// Assert the the constructor has the modifier PRIVATE
+			assertEquals(Modifier.PRIVATE, modifiers);
+			
+			// Get the single instance of the RentalSystem using the global access point
+			RentalSystem instance = RentalSystem.getInstance();
+			
+			// Assert the single instance of RentalSystem is not null
+			assertNotNull(instance);
+			
+		} catch (Exception e) {
+			// If a method throws an exception, make the test fail and display why
+			fail("Test failed due to exception: " + e.getMessage());
+		}
+		
+	}
 }
