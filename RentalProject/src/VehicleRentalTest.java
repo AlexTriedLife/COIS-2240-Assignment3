@@ -1,5 +1,7 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,8 +71,58 @@ class VehicleRentalTest {
 		
 		// After setting invalid plates invalidVehicle should have a null plate
 		assertNull(invalidVehicle.getLicensePlate());
+	}
+	
+	@Test 
+	void testRentAndReturnVehicle() {
+		// Vehicles to test
+		Vehicle car = new Car("Volkswagen", "Beetle", 1990, 5);
+		Vehicle truck = new PickupTruck("Dodge", "Ram", 2007, 1315, true);
 		
+		// Set valid plates
+		car.setLicensePlate("BEE713");
+		truck.setLicensePlate("RAM007");
+		
+		// Customers to test
+		Customer customer1 = new Customer(38, "Mohamed");
+		Customer customer2 = new Customer(39, "Emma");
 
+		// Vehicles should both be AVAILABLE after creation
+		assertEquals(Vehicle.VehicleStatus.Available, car.getStatus());
+		assertEquals(Vehicle.VehicleStatus.Available, truck.getStatus());
+		
+		// Test the renting logic using the single instance of RentalSystem
+		
+		// Set the rental date to today
+		LocalDate date = LocalDate.now();
+		
+		// Ensure a valid rental returns true
+		assertTrue(testSystem.rentVehicle(car, customer1, date, 50.0));
+		assertTrue(testSystem.rentVehicle(truck, customer2, date, 75.0));
+		
+		// Ensure both vehicles are marked as RENTED after being rented
+		assertEquals(Vehicle.VehicleStatus.Rented, car.getStatus());
+		assertEquals(Vehicle.VehicleStatus.Rented, truck.getStatus());
+		
+		// Ensure attempting to rent a vehicle which is already rented returns false
+		// Rent the same vehicles again, asserting failure
+		assertFalse(testSystem.rentVehicle(car, customer1, date, 50.0));
+		assertFalse(testSystem.rentVehicle(truck, customer2, date, 75.0));
+		
+		// Test the returning logic
+		
+		// Ensure a valid return is successful and returns true
+		assertTrue(testSystem.returnVehicle(car, customer1, date, 0.0));
+		assertTrue(testSystem.returnVehicle(truck, customer2, date, 0.0));
+		
+		// Ensure both vehicles are marked as AVAILABLE after being returned
+		assertEquals(Vehicle.VehicleStatus.Available, car.getStatus());
+		assertEquals(Vehicle.VehicleStatus.Available, truck.getStatus());
+		
+		// Return the same vehicles again ensuring a vehicle cannot be returned without being rented first
+		assertFalse(testSystem.returnVehicle(car, customer1, date, 0.0));
+		assertFalse(testSystem.returnVehicle(truck, customer2, date, 0.0));
+		
 	}
 
 }

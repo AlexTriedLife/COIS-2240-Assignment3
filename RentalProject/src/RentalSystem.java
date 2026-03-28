@@ -71,7 +71,7 @@ public class RentalSystem {
         return true;
     }
 
-    public void rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
+    public boolean rentVehicle(Vehicle vehicle, Customer customer, LocalDate date, double amount) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Available) {
             vehicle.setStatus(Vehicle.VehicleStatus.Rented);
             // Create record for vehicle being rented
@@ -84,10 +84,15 @@ public class RentalSystem {
         }
         else {
             System.out.println("Vehicle is not available for renting.");
+            // Return false if vehicle isn't available
+            return false;
         }
+        
+        // Return true if vehicle was available and was rented successfully
+        return true;
     }
 
-    public void returnVehicle(Vehicle vehicle, Customer customer, LocalDate date, double extraFees) {
+    public boolean returnVehicle(Vehicle vehicle, Customer customer, LocalDate date, double extraFees) {
         if (vehicle.getStatus() == Vehicle.VehicleStatus.Rented) {
             vehicle.setStatus(Vehicle.VehicleStatus.Available);
             // Create record for vehicle being returned
@@ -100,7 +105,12 @@ public class RentalSystem {
         }
         else {
             System.out.println("Vehicle is not rented.");
+            // Return false if vehicle is not rented or successfully returned 
+            return false;
         }
+        
+        // Return true if vehicle was successfully returned
+        return true;
     }    
 
     public void displayVehicles(Vehicle.VehicleStatus status) {
