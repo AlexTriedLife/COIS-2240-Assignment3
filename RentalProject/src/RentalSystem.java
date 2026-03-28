@@ -1,4 +1,6 @@
 import java.util.List;
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -288,7 +290,6 @@ public class RentalSystem {
     			Vehicle.VehicleStatus status = Vehicle.VehicleStatus.valueOf(vehicleData[4]);
     			
     			// Create the new vehicle and save it to the list vehicles
-    			// TODO: add logic handling for different types of vehicles
     			// 5 is number of seats
     			Vehicle vehicle = new Car(make, model, year, 5);
     			vehicle.setLicensePlate(plate);
@@ -362,6 +363,14 @@ public class RentalSystem {
     			if (vehicle != null && customer != null) {
     				RentalRecord record = new RentalRecord(vehicle, customer, recordDate, totalAmount, recordType);
     				rentalHistory.addRecord(record);
+    				
+    				// Update the vehicle state to match the state of the transaction in the rental history
+    				// If vehicle is rented set its status to Rented, if returned, set status to Available
+    				if (record.getRecordType().equalsIgnoreCase("RENT")) {
+    					vehicle.setStatus(Vehicle.VehicleStatus.Rented);
+    				} else if(record.getRecordType().equalsIgnoreCase("RETURN")) {
+    					vehicle.setStatus(Vehicle.VehicleStatus.Available);
+    				}
     			}
     		}
     		
