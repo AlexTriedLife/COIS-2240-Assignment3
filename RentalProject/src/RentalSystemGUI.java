@@ -1,6 +1,7 @@
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -27,8 +28,11 @@ public class RentalSystemGUI extends Application {
 			
 			root = new BorderPane();
 			
+			// Add the navigation bar to the top of the window
+			root.setTop(createNavigationBarView());
+			
 			// Set the default view to addVehicle
-			root.setCenter(createAddVehicleComponent());
+			root.setCenter(createAddVehicleView());
 			
 			// Scene setup
 			Scene scene = new Scene(root, 800, 600);
@@ -47,6 +51,33 @@ public class RentalSystemGUI extends Application {
 		
 	}
 	
+	// For selecting different components to show
+	private HBox createNavigationBarView() {
+		HBox navBar = new HBox(20);
+		navBar.setPadding(new Insets(10));
+		navBar.setAlignment(Pos.CENTER);
+		
+		// Buttons for changing displayed view
+		Button btnAddVehicle = new Button("Add Vehicle");
+		Button btnAddCustomer = new Button("Add Customer");
+		Button btnRentReturn = new Button("Rent or Return");
+		Button btnAvailable = new Button("Available Vehicles");
+		Button btnShowHistory = new Button("Display History");
+		
+		// Display the corresponding view when a button is pressed
+		btnAddVehicle.setOnAction(event -> root.setCenter(createAddVehicleView()));
+		btnAddCustomer.setOnAction(event -> root.setCenter(createAddCustomerView()));
+		btnRentReturn.setOnAction(event -> root.setCenter(createRentReturnView()));
+		btnAvailable.setOnAction(event -> root.setCenter(createAvailableView()));
+		btnShowHistory.setOnAction(event -> root.setCenter(createHistoryView()));
+		
+		// Add all buttons to the navBar
+		navBar.getChildren().addAll(btnAddVehicle, btnAddCustomer, btnRentReturn, btnAvailable, btnShowHistory);
+		
+		return navBar;
+		
+	}
+	
 	// Display information or error
 	private void displayMessage(Alert.AlertType type,String message) {
 		Alert alert = new Alert(type);
@@ -56,9 +87,9 @@ public class RentalSystemGUI extends Application {
 	}
 	
 	// The component for adding a vehicle
-	
-	private GridPane createAddVehicleComponent() {
+	private GridPane createAddVehicleView() {
 		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(20));
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setAlignment(Pos.CENTER);
@@ -129,7 +160,7 @@ public class RentalSystemGUI extends Application {
 		// Grid layout
 		
 		// Add a label to the top of the grid spanning two columns
-		grid.add(new Label("Add new Vehicle"), 0, 0, 2, 1);
+		grid.add(new Label("Add New Vehicle"), 0, 0, 2, 1);
 		// Add the vehicle type selector to the second row of the grid and add a label to the left of it
 		grid.add(new Label("Type:"), 0, 1);
 		grid.add(typeBox, 1, 1);
@@ -151,7 +182,7 @@ public class RentalSystemGUI extends Application {
 		grid.add(submitBtn, 1, 7);
 		
 		
-		// Event for the submit button
+		// Event for pressing the submit button
 		submitBtn.setOnAction(event -> {
 			try {
 				// Get the values of the inputs
@@ -196,21 +227,109 @@ public class RentalSystemGUI extends Application {
 					trailerBox.setSelected(false);
 				} else {
 					// Display failure
-					displayMessage(AlertType.ERROR, "Vehicle could not be added.");
+					displayMessage(AlertType.ERROR, "Vehicle could not be added. Plate may already exist in the system.");
 				}
 				
 			} catch (Exception e) {
 				displayMessage(AlertType.ERROR, e.getMessage());
 			}
 		});
-
-		
 		
 		return grid;
 		
 	}
 	
+	// The component for adding a customer 
+	private GridPane createAddCustomerView() {
+		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(20));
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setAlignment(Pos.CENTER);
+		
+		// Input for customer details
+		TextField idField = new TextField();
+		TextField nameField = new TextField();
+		Button submitBtn = new Button("Add Customer");
+		
+		// Grid layout
+		// Add a label to the top of the grid spanning two columns
+		grid.add(new Label("Add New Customer"), 0, 0, 2, 1);
+		// Add the customerID input to the second row of the grid and add a label to the left of it
+		grid.add(new Label("Customer ID:"), 0, 1);
+		grid.add(idField, 1, 1);
+		// Create the input for customer name in the third row of the grid and add a label to the left of it
+		grid.add(new Label("Name:"), 0, 2);
+		grid.add(nameField, 1, 2);
+		// Add the submit button to the fourth row of the grid
+		grid.add(submitBtn, 1, 3);
+		
+		// Event for pressing the submit button
+		submitBtn.setOnAction(event -> {
+			try {
+				// Get values from inputs
+				int id = Integer.parseInt(idField.getText());
+				String name = nameField.getText();
+				
+				// Create new customer
+				Customer customer = new Customer(id, name);
+				
+				// Add customer to system and verify success
+				if (rentalSystem.addCustomer(customer)) {
+					// Display success
+					displayMessage(AlertType.INFORMATION, "Customer added successfully.");
+					// Clear fields
+					idField.clear();
+					nameField.clear();
+				} else {
+					// Display failure
+					displayMessage(AlertType.ERROR, "Customer could not be added. ID may already exist.");
+				}
+				
+			} catch (Exception e) {
+				// Display exception
+				displayMessage(AlertType.ERROR, e.getMessage());
+			}
+		});
+		
+		return grid;
+	}
+	
 	// Main method for running the GUI
+	
+	// The component for renting or returning a vehicle
+	private GridPane createRentReturnView() {
+		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(20));
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setAlignment(Pos.CENTER);
+		
+		return grid;
+	}
+	
+	// The component for displaying available vehicles
+	private GridPane createAvailableView() {
+		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(20));
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setAlignment(Pos.CENTER);
+		
+		return grid;
+	}
+
+	// The component for displaying rental history
+		private GridPane createHistoryView() {
+			GridPane grid = new GridPane();
+			grid.setPadding(new Insets(20));
+			grid.setHgap(10);
+			grid.setVgap(10);
+			grid.setAlignment(Pos.CENTER);
+			
+			return grid;
+		}
+	
 	
 	public static void main(String[] args) {
 		launch(args);
