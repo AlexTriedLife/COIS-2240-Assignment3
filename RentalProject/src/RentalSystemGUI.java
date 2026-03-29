@@ -2,6 +2,7 @@
 import java.time.LocalDate;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -423,14 +424,46 @@ public class RentalSystemGUI extends Application {
 	}
 
 	// The component for displaying rental history
-		private GridPane createHistoryView() {
-			GridPane grid = new GridPane();
-			grid.setPadding(new Insets(20));
-			grid.setHgap(10);
-			grid.setVgap(10);
-			grid.setAlignment(Pos.CENTER);
+		private VBox createHistoryView() {
+			VBox layout = new VBox(10);
+			layout.setPadding(new Insets(20));
+		
+			// A table displaying rental history
+			TableView<RentalRecord> table = new TableView<RentalRecord>();
 			
-			return grid;
+			// Define columns and bind them to respective object properties using lambda expressions
+			// Column for vehicle type
+			TableColumn<RentalRecord, String> typeCol = new TableColumn<RentalRecord, String>("Type");
+			// Gets the rental record in the cell and then gets the record type
+			typeCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getRecordType()));
+			
+			// Column for plate
+			TableColumn<RentalRecord, String> plateCol = new TableColumn<RentalRecord, String>("Plate");
+			plateCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getVehicle().getLicensePlate()));
+			
+			// Column for customer
+			TableColumn<RentalRecord, String> customerCol = new TableColumn<RentalRecord, String>("Customer");
+			customerCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCustomer().getCustomerName()));
+			
+			// Column for date
+			TableColumn<RentalRecord, String> dateCol = new TableColumn<RentalRecord, String>("Date");
+			dateCol.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getRecordDate().toString()));
+			
+			// Column for amount
+			TableColumn<RentalRecord, String> amountCol = new TableColumn<RentalRecord, String>("Amount");
+			amountCol.setCellValueFactory(cell -> new SimpleStringProperty(String.format("$%.2f", cell.getValue().getTotalAmount())));
+			
+			// Add columns to table
+			table.getColumns().addAll(typeCol, plateCol, customerCol, dateCol, amountCol);
+			
+			// Get rental history from RentalSystem and dynamically populate the table
+			ObservableList<RentalRecord> rentalHistory = FXCollections.observableArrayList(rentalSystem.getRentalRecords());
+			table.setItems(rentalHistory);
+			
+			// Add add a title label and the table to the layout
+			layout.getChildren().addAll(new Label("Rental History"), table);
+			
+			return layout;
 		}
 	
 	
