@@ -410,5 +410,9 @@ public class RentalSystem {
     	return available;
     }
     
+    public List<RentalRecord> getRentalRecords() {
+    	return this.rentalHistory.getRentalHistory();
+    }
+    
     
 }
