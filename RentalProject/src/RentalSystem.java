@@ -393,6 +393,10 @@ public class RentalSystem {
     	return this.customers;
     }
     
+    public List<Vehicle> getVehicles() {
+    	return this.vehicles;
+    }
+    
     public List<Vehicle> getAvailableVehicles() {
     	List<Vehicle> available = new ArrayList<>();
     	
