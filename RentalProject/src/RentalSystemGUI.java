@@ -406,14 +406,20 @@ public class RentalSystemGUI extends Application {
 	}
 	
 	// The component for displaying available vehicles
-	private GridPane createAvailableView() {
-		GridPane grid = new GridPane();
-		grid.setPadding(new Insets(20));
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setAlignment(Pos.CENTER);
+	private VBox createAvailableView() {
+		VBox layout = new VBox(10);
+		layout.setPadding(new Insets(20));
 		
-		return grid;
+		ListView<Vehicle> listView = new ListView<>();
+		// Get available vehicles
+		ObservableList<Vehicle> vehicles = FXCollections.observableArrayList(rentalSystem.getAvailableVehicles());
+		// Set the items of the listView to the available vehicles
+		listView.setItems(vehicles);
+		
+		// Display available vehicles
+		layout.getChildren().addAll(new Label("Available Vehicles:"), listView);
+		
+		return layout;
 	}
 
 	// The component for displaying rental history
