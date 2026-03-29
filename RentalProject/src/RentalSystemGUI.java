@@ -1,6 +1,9 @@
 
+import java.time.LocalDate;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -213,7 +216,7 @@ public class RentalSystemGUI extends Application {
 				// Add vehicle to system and verify success
 				if (rentalSystem.addVehicle(newVehicle)) {
 					// Display success 
-					displayMessage(AlertType.INFORMATION, "Vehicle added successfully.");
+					displayMessage(AlertType.CONFIRMATION, "Vehicle added successfully.");
 					
 					// Clear fields
 					makeField.clear();
@@ -277,7 +280,7 @@ public class RentalSystemGUI extends Application {
 				// Add customer to system and verify success
 				if (rentalSystem.addCustomer(customer)) {
 					// Display success
-					displayMessage(AlertType.INFORMATION, "Customer added successfully.");
+					displayMessage(AlertType.CONFIRMATION, "Customer added successfully.");
 					// Clear fields
 					idField.clear();
 					nameField.clear();
@@ -298,14 +301,108 @@ public class RentalSystemGUI extends Application {
 	// Main method for running the GUI
 	
 	// The component for renting or returning a vehicle
-	private GridPane createRentReturnView() {
-		GridPane grid = new GridPane();
-		grid.setPadding(new Insets(20));
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setAlignment(Pos.CENTER);
+	private VBox createRentReturnView() {
+		VBox layout = new VBox(10);
+		layout.setPadding(new Insets(20));
+		layout.setAlignment(Pos.CENTER);
 		
-		return grid;
+		
+		// Get customers and vehicles from the system
+		ObservableList<Customer> customers = FXCollections.observableArrayList(rentalSystem.getCustomers());
+		ObservableList<Vehicle> vehicles = FXCollections.observableArrayList(rentalSystem.getVehicles());
+		
+		// Drop down menus for selecting customer and vehicle		
+		ComboBox<Customer> customerBox = new ComboBox<>(customers);
+		customerBox.setPromptText("Select Customer");
+		ComboBox<Vehicle> vehicleBox = new ComboBox<>(vehicles);
+		vehicleBox.setPromptText("Select Vehicle");
+		// Label which displays the status of the vehicle
+		Label statusLabel = new Label("Vehicle Status: None Selected");
+		
+		TextField amountField = new TextField();
+		amountField.setPromptText("Rental Amount / Return Fee");
+		
+		// Area for the rent and return buttons
+		HBox buttons = new HBox(10);
+		buttons.setAlignment(Pos.CENTER);
+		
+		// Rent and return buttons
+		Button rentBtn = new Button("Rent");
+		Button returnBtn = new Button("Return");
+		// Add buttons to the buttons area
+		buttons.getChildren().addAll(rentBtn, returnBtn);
+		
+		// Layout for the rent return view
+		layout.getChildren().addAll(new Label("Rent or Return Vehicle"), customerBox, vehicleBox, statusLabel, amountField, buttons);
+		
+		// When a dropdown item in the vehicleBox is clicked dynamically change the label to the status of the selected vehicle
+		vehicleBox.setOnAction(event -> {
+			Vehicle selected = vehicleBox.getValue();
+			// If selected is not null display status otherwise say none selected
+			statusLabel.setText("Vehicle Status: " + (selected != null ? selected.getStatus().toString() : "None Selected"));
+			
+		});
+		
+		// Rent event
+		rentBtn.setOnAction(event -> {
+			try {
+				// Get selected customer, vehicle, and rental amount or return fee
+				Customer selectedCustomer = customerBox.getValue();
+				Vehicle selectedVehicle = vehicleBox.getValue();
+				double amount = Double.parseDouble(amountField.getText());
+				
+				// If either customer or vehicle are not selected exit
+				if (selectedCustomer == null || selectedVehicle == null) {
+					displayMessage(AlertType.WARNING, "Please select both a customer and a vehicle.");
+					return;
+				}
+				
+				// Rent vehicle and verify success
+				if(rentalSystem.rentVehicle(selectedVehicle, selectedCustomer, LocalDate.now(), amount)) {
+					displayMessage(AlertType.CONFIRMATION, "Vehicle rented successfully.");
+					// Refresh the view thus updating dropdowns
+					root.setCenter(createRentReturnView());
+				} else {
+					displayMessage(AlertType.ERROR, "Vehicle could not be rented.");
+				}
+				
+				
+			} catch (Exception e) {
+				displayMessage(AlertType.ERROR, e.getMessage());
+			}
+		});
+		
+		// Return event
+		returnBtn.setOnAction(event -> {
+			try {
+				// Get selected customer, vehicle, and rental amount or return fee
+				Customer selectedCustomer = customerBox.getValue();
+				Vehicle selectedVehicle = vehicleBox.getValue();
+				double fee = Double.parseDouble(amountField.getText());
+				
+				// If either customer or vehicle are not selected exit
+				if (selectedCustomer == null || selectedVehicle == null) {
+					displayMessage(AlertType.WARNING, "Please select both a customer and a vehicle.");
+					return;
+				}
+				
+				// Return vehicle and verify success
+				if(rentalSystem.returnVehicle(selectedVehicle, selectedCustomer, LocalDate.now(), fee)) {
+					displayMessage(AlertType.CONFIRMATION, "Vehicle returned successfully.");
+					// Refresh the view thus updating dropdowns
+					root.setCenter(createRentReturnView());
+				} else {
+					displayMessage(AlertType.ERROR, "Vehicle could not be returned.");
+				}
+				
+				
+			} catch (Exception e) {
+				displayMessage(AlertType.ERROR, e.getMessage());
+			}
+		});
+		
+		
+		return layout;
 	}
 	
 	// The component for displaying available vehicles
