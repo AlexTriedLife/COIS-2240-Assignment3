@@ -85,4 +85,9 @@ public abstract class Vehicle {
     	
     	return true;
     }
+    
+    @Override public String toString() {
+    	// Format: plate "|" year  make model
+    	return String.format("%s | %d %s %s", licensePlate, year, make, model);
+    }
 }
