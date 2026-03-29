@@ -1,6 +1,5 @@
 import java.util.List;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -388,6 +387,23 @@ public class RentalSystem {
 			// Log error if file not found
 			System.out.println("Error loading rental_records.txt: " + e.getMessage());
 		}
+    }
+    
+    public List<Customer> getCustomers() {
+    	return this.customers;
+    }
+    
+    public List<Vehicle> getAvailableVehicles() {
+    	List<Vehicle> available = new ArrayList<>();
+    	
+    	for (Vehicle vehicle : this.vehicles) {
+    		// If vehicle status is available add it to the available list
+    		if (vehicle.getStatus() == Vehicle.VehicleStatus.Available) {
+    		available.add(vehicle);
+    		}
+    	}
+    	
+    	return available;
     }
     
     
